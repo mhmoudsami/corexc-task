@@ -409,15 +409,6 @@
                 this.getProducts(true);
             },
             addToCart(product){
-                var exist = _.find(this.cart , function(p){
-                    return p.id == product.id;
-                });
-
-                if ( exist ) {
-                    this.$toastr.i('Product Already Exist');
-                    return;
-                }
-
                 // remove first if exist
                 this.cart = _.reject(this.cart , function(p){
                     return p.id == product.id;
@@ -435,7 +426,30 @@
                 this.$toastr.s('Product Removed From Cart');
             },
             submitCartData(){
+                if ( this.cart.length < 1 ) {
+                    this.$toastr.i('Your Cart Is Empty');
+                    return false;
+                }
 
+                this.isLoading = true;
+
+                axios.post('/api/cart/submit' , {
+                    cart: this.cart,
+                }).then( response=> {
+                    if ( response.data.success == false ) {
+                        this.$toastr.i(response.data.message);
+                        return;
+                    }
+                    // empty cart
+                    this.cart = [];
+                    // hide
+                    this.toggleCartVisibility();
+                    // display success message
+                    this.$toastr.s(response.data.message);
+
+                }).finally(a=>{
+                    this.isLoading = false;
+                });
             }
         }
     }
