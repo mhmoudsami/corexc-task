@@ -18,18 +18,12 @@ class ProductsController extends Controller
     	$products = Product::where([])->select('products.*' , DB::raw('1 as quantity'));
 
     	/**
-    	 * Filter By price:from
+    	 * Filter By price from:to
     	 */
-    	if ( $request->priceFrom ) {
-    		$products->where('price' , '>=' , $request->priceFrom);
-    	}
-
-    	/**
-    	 * Filter By price:to
-    	 */
-    	if ( $request->priceTo ) {
-    		$products->where('price' , '<=' , $request->priceTo);
-    	}
+        if ( $request->priceRange ) {
+            $products->where('price' , '>=' , $request->priceRange[0]);
+            $products->where('price' , '<=' , $request->priceRange[1]);
+        }
 
     	/**
     	 * Filter By brands
